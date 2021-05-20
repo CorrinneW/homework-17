@@ -1,5 +1,3 @@
-const router = require('express').Router
-
 const API = {
   async getLastWorkout() {
     let res;
@@ -45,4 +43,4 @@ const API = {
   },
 };
 
-module.exports = router
+module.exports=API;
