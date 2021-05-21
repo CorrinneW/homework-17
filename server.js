@@ -2,11 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require('path');
 
-const workouts = require('./public/workout').default
-
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+const db = require("./models");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -24,7 +24,8 @@ app.get('/exercise', (req, res) => res.sendFile(path.join(__dirname, '/public/ex
 app.get('/stats', (req, res) => res.sendFile(path.join(__dirname, '/public/stats.html')));
 
 // api routes
-app.get('/api/workouts', (req, res) => res.json(workouts));
+app.use(require("./routes/api.js"))
+
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
