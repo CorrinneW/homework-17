@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {Workout, Exercise} = require('../models')
+const {Workout} = require('../models')
 
 //create workout
 router.post('/api/workouts', ({ body }, res) => {
@@ -15,20 +15,29 @@ router.post('/api/workouts', ({ body }, res) => {
 //get all workouts
 router.get('/api/workouts', async (req, res) => {
     try{
-        const getWorkout = await Workout.find({})
+        const getWorkout = await Workout.aggregate([
+            {
+                $addFields: {
+                    totalDuration: { $sum: "$exercises.duration" },
+                    totalWeight: { $sum: "$exercises.weight" }
+                }
+            }
+        ])
         res.json(getWorkout)
     }
-    catch(err){res.json(err.message)}
+    catch{
+        res.status(400).json('error occured')
+    }
 })
 
 //update current workout with new exercise
 router.put('/api/workouts/:id', async (req, res) => {
     try{
        const newExercise = await Workout.findOneAndUpdate({_id: req.params.id}, {$push: {exercises: req.body}})
-       console.log(newExercise);
+       res.json(newExercise)
     }
-    catch(err){
-        res.json(err.message)
+    catch{
+        res.status(400).json('error occured')
     }
 })
 
@@ -49,11 +58,11 @@ router.get('/api/workouts/range', async (req, res) => {
         .sort({day: -1})
         .limit(7)
 
-        console.log(workoutRange);
-        return workoutRange
+        res.json(workoutRange)
+        console.log(workoutRange)
     }
     catch{
-        res.status(400).json(err.message)
+        res.status(400).json('error occured')
     }
 })
 
